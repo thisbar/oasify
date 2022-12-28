@@ -16,6 +16,14 @@ const fullDataType = (type) => {
 const guardParameterName = (name) => {
 	return name.Parameter || name.Parameters;
 }
+
+const guardRequired = (value) => {
+	if (value === 'Required') value = true;
+	if (value === 'Optional') value = false;
+
+	return value;
+}
+
 app.use(json())
 app.use(function (req, res, next) {
 	res.header("Content-Type",'text/yaml');
@@ -26,7 +34,7 @@ app.post('/requestbody', function(req, res) {
 	let OASRequestBody = req.body.map(key => {
 		return {
 			[guardParameterName(key)]: {
-				required: key.Mandatory,
+				required: guardRequired(key.Mandatory),
 				description: `${key.Description}`,
 				schema: {
 					type: fullDataType(key.Type)
@@ -44,7 +52,7 @@ app.post('/parameters', function(req, res) {
 			in: 'query',
 			name: guardParameterName(key),
 			description: `${key.Description}`,
-			required: key.Mandatory,
+			required: guardRequired(key.Mandatory),
 			type: fullDataType(key.Type)
 		}
 	});
